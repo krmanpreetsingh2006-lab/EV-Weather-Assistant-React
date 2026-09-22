@@ -1,29 +1,45 @@
 function WeatherCard({ weather }) {
   const iconCode = weather.weather[0].icon
   const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`
+  const country = weather.sys?.country ? `, ${weather.sys.country}` : ""
 
   return (
     <div className="weather-card">
-      {/* City */}
-      <div className="city-header">
-        <span className="location-icon">📍</span>
-        <h2>{weather.name}</h2>
+      {/* City & Condition Header */}
+      <div className="weather-card-header">
+        <div className="city-header">
+          <span className="location-icon">📍</span>
+          <h2>
+            {weather.name}
+            <span className="country-code">{country}</span>
+          </h2>
+        </div>
+        <div className="condition-pill">
+          {weather.weather[0].description}
+        </div>
       </div>
 
       {/* Main Weather Focus */}
       <div className="weather-main">
-        <img
-          src={iconUrl}
-          alt={weather.weather[0].description}
-          className="weather-icon"
-        />
+        <div className="weather-icon-wrapper">
+          <img
+            src={iconUrl}
+            alt={weather.weather[0].description}
+            className="weather-icon"
+          />
+        </div>
         <div className="temp-block">
           <div className="temperature">
-            {Math.round(weather.main.temp)}°C
+            {Math.round(weather.main.temp)}
+            <span className="temp-unit">°C</span>
           </div>
-          <p className="condition">
-            {weather.weather[0].description}
-          </p>
+          <div className="temp-range-sub">
+            <span>Feels like {Math.round(weather.main.feels_like)}°C</span>
+            <span className="dot-divider">•</span>
+            <span>H: {Math.round(weather.main.temp_max)}°</span>
+            <span className="dot-divider">•</span>
+            <span>L: {Math.round(weather.main.temp_min)}°</span>
+          </div>
         </div>
       </div>
 

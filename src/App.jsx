@@ -1,6 +1,8 @@
-import EVRecommendation from './EVRecommendation'
-import WeatherCard from './WeatherCard'
 import { useState } from 'react'
+import Hyperspeed from './components/Hyperspeed/Hyperspeed'
+import { hyperspeedPresets } from './components/Hyperspeed/HyperSpeedPresets'
+import WeatherCard from './WeatherCard'
+import EVRecommendation from './EVRecommendation'
 import './App.css'
 
 function App() {
@@ -116,103 +118,133 @@ function App() {
   }
 
   return (
-    <div className="app">
-
-      {/* Header */}
-      <header className="header">
-        <div className="header-icon">⚡</div>
-        <h1>EV Weather & Trip Assistant</h1>
-        <p className="subtitle">
-          Smart weather insights for EV journeys
-        </p>
-      </header>
-
-      {/* Search */}
-      <div className="search-section">
-        <div className="search-box">
-
-          <input
-            type="text"
-            placeholder="Enter city name..."
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                searchWeather()
-              }
-            }}
-          />
-
-          <button
-            onClick={() => searchWeather()}
-            className="search-btn"
-          >
-            Search Weather
-          </button>
-
-          <button
-            onClick={getCurrentLocation}
-            className="location-btn"
-          >
-            📍 Use My Location
-          </button>
-
-        </div>
+    <div className="app-wrapper">
+      {/* Background Hyperspeed Canvas Layer */}
+      <div className="hyperspeed-layer" aria-hidden="true">
+        <Hyperspeed effectOptions={hyperspeedPresets.evElectric} />
       </div>
 
-      {/* Search History */}
-      {history.length > 0 && (
-        <div className="history">
-          <h2>Search History</h2>
+      {/* Dark Ambient Overlay to ensure text readability */}
+      <div className="dark-overlay" aria-hidden="true"></div>
 
-          <div className="history-list">
-            {history.map((item) => (
-              <button
-                key={item}
-                className="history-item"
-                onClick={() => searchWeather(item)}
-              >
-                📍 {item}
-              </button>
-            ))}
+      {/* Foreground Interactive Content */}
+      <main className="app">
+        {/* Header */}
+        <header className="header">
+          <div className="header-badge">
+            <span className="badge-pulse"></span>
+            <span className="header-icon">⚡</span>
+            <span className="badge-text">EV Range &amp; Weather Intelligence</span>
           </div>
+          <h1>EV Weather &amp; Trip Assistant</h1>
+          <p className="subtitle">
+            Real-time weather insights &amp; battery efficiency forecasting
+          </p>
+        </header>
 
-          <button
-            className="clear-history"
-            onClick={() => {
-              setHistory([])
-              localStorage.removeItem("weatherHistory")
-            }}
-          >
-            Clear History
-          </button>
+        {/* Search Bar */}
+        <div className="search-section">
+          <div className="search-box">
+            <div className="input-wrapper">
+              <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input
+                type="text"
+                placeholder="Search destination city (e.g., Oslo, Seattle, Tokyo)..."
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    searchWeather()
+                  }
+                }}
+              />
+            </div>
+
+            <div className="search-actions">
+              <button
+                onClick={() => searchWeather()}
+                className="search-btn"
+              >
+                Search Weather
+              </button>
+
+              <button
+                onClick={getCurrentLocation}
+                className="location-btn"
+                title="Use current GPS location"
+              >
+                <span className="loc-pin">📍</span> Use My Location
+              </button>
+            </div>
+          </div>
         </div>
-      )}
 
-      {/* Loading */}
-      {loading && (
-        <div className="status-card loading-card">
-          <div className="spinner"></div>
-          <p>Fetching weather data...</p>
-        </div>
-      )}
+        {/* Search History */}
+        {history.length > 0 && (
+          <div className="history">
+            <div className="history-header">
+              <span className="history-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                Recent Searches
+              </span>
 
-      {/* Error */}
-      {error && (
-        <div className="status-card error-card">
-          <span className="error-icon">⚠️</span>
-          <p>{error}</p>
-        </div>
-      )}
+              <button
+                className="clear-history"
+                onClick={() => {
+                  setHistory([])
+                  localStorage.removeItem("weatherHistory")
+                }}
+                title="Clear all recent searches"
+              >
+                Clear
+              </button>
+            </div>
 
-      {/* Results */}
-      {weather && (
-        <div className="results">
-          <WeatherCard weather={weather} />
-          <EVRecommendation weather={weather} />
-        </div>
-      )}
+            <div className="history-list">
+              {history.map((item) => (
+                <button
+                  key={item}
+                  className="history-item"
+                  onClick={() => searchWeather(item)}
+                >
+                  <span className="pin">📍</span>
+                  <span className="item-name">{item}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
+        {/* Loading State */}
+        {loading && (
+          <div className="status-card loading-card">
+            <div className="spinner"></div>
+            <p>Fetching real-time atmospheric data...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="status-card error-card">
+            <span className="error-icon">⚠️</span>
+            <p>{error}</p>
+          </div>
+        )}
+
+        {/* Weather & EV Recommendations Results */}
+        {weather && (
+          <div className="results">
+            <WeatherCard weather={weather} />
+            <EVRecommendation weather={weather} />
+          </div>
+        )}
+      </main>
     </div>
   )
 }
